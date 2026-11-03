@@ -1,178 +1,178 @@
-// =========================================
-// 1. MOBILE NAVIGATION
-// =========================================
+// ========================================
+// MOBILE NAVIGATION
+// ========================================
 
 const menuToggle = document.getElementById("menuToggle");
 const navLinks = document.getElementById("navLinks");
 
-menuToggle.addEventListener("click", () => {
-  const isOpen = navLinks.classList.toggle("open");
+if (menuToggle && navLinks) {
+  menuToggle.addEventListener("click", function () {
+    const isOpen = navLinks.classList.toggle("open");
 
-  menuToggle.setAttribute("aria-expanded", String(isOpen));
-});
-
-// Close mobile menu after clicking a navigation link
-
-document.querySelectorAll(".nav-link").forEach((link) => {
-  link.addEventListener("click", () => {
-    navLinks.classList.remove("open");
-    menuToggle.setAttribute("aria-expanded", "false");
+    menuToggle.setAttribute("aria-expanded", isOpen);
   });
-});
 
-// =========================================
-// 2. ACTIVE NAVIGATION LINK ON SCROLL
-// =========================================
-
-const sections = document.querySelectorAll("main section[id]");
-const navItems = document.querySelectorAll(".nav-link");
-
-const observer = new IntersectionObserver(
-  (entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        navItems.forEach((item) => {
-          item.classList.toggle(
-            "active",
-            item.getAttribute("href") === `#${entry.target.id}`,
-          );
-        });
-      }
+  document.querySelectorAll(".nav-link").forEach(function (link) {
+    link.addEventListener("click", function () {
+      navLinks.classList.remove("open");
+      menuToggle.setAttribute("aria-expanded", "false");
     });
-  },
-  {
-    rootMargin: "-35% 0px -55% 0px",
-  },
-);
+  });
+}
 
-sections.forEach((section) => {
-  observer.observe(section);
-});
+// ========================================
+// LIGHT / DARK MODE
+// ========================================
 
-// =========================================
-// 3. CONTACT FORM VALIDATION
-// =========================================
+const themeToggle = document.getElementById("themeToggle");
+
+if (themeToggle) {
+  const savedTheme = localStorage.getItem("portfolio-theme") || "light";
+
+  document.documentElement.setAttribute("data-theme", savedTheme);
+
+  function updateThemeButton(theme) {
+    themeToggle.textContent = theme === "dark" ? "☀️" : "🌙";
+
+    themeToggle.setAttribute(
+      "aria-label",
+      theme === "dark" ? "Switch to light mode" : "Switch to dark mode",
+    );
+
+    themeToggle.setAttribute(
+      "title",
+      theme === "dark" ? "Switch to light mode" : "Switch to dark mode",
+    );
+  }
+
+  updateThemeButton(savedTheme);
+
+  themeToggle.addEventListener("click", function () {
+    const currentTheme =
+      document.documentElement.getAttribute("data-theme") || "light";
+
+    const newTheme = currentTheme === "light" ? "dark" : "light";
+
+    document.documentElement.setAttribute("data-theme", newTheme);
+
+    localStorage.setItem("portfolio-theme", newTheme);
+
+    updateThemeButton(newTheme);
+  });
+}
+
+// ========================================
+// CONTACT FORM VALIDATION
+// ========================================
 
 const contactForm = document.getElementById("contactForm");
-const formNote = document.getElementById("formNote");
 
-// Display validation error messages
+if (contactForm) {
+  contactForm.addEventListener("submit", function (event) {
+    event.preventDefault();
 
-const setError = (id, message) => {
-  document.getElementById(id).textContent = message;
-};
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const subject = document.getElementById("subject").value.trim();
+    const message = document.getElementById("message").value.trim();
 
-// =========================================
-// 4. FORM SUBMISSION
-// =========================================
+    const nameError = document.getElementById("nameError");
+    const emailError = document.getElementById("emailError");
+    const subjectError = document.getElementById("subjectError");
+    const messageError = document.getElementById("messageError");
+    const formNote = document.getElementById("formNote");
 
-contactForm.addEventListener("submit", (event) => {
-  event.preventDefault();
+    nameError.textContent = "";
+    emailError.textContent = "";
+    subjectError.textContent = "";
+    messageError.textContent = "";
 
-  // Get form values
+    formNote.textContent = "";
+    formNote.className = "form-note";
 
-  const name = document.getElementById("name").value.trim();
-  const email = document.getElementById("email").value.trim();
-  const subject = document.getElementById("subject").value.trim();
-  const message = document.getElementById("message").value.trim();
+    let isValid = true;
 
-  // Email validation pattern
+    if (name.length < 2) {
+      nameError.textContent = "Please enter your name.";
+      isValid = false;
+    }
 
-  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-  // Clear previous error messages
+    if (!emailPattern.test(email)) {
+      emailError.textContent = "Please enter a valid email address.";
+      isValid = false;
+    }
 
-  setError("nameError", "");
-  setError("emailError", "");
-  setError("subjectError", "");
-  setError("messageError", "");
+    if (subject.length < 3) {
+      subjectError.textContent = "Please enter a subject.";
+      isValid = false;
+    }
 
-  formNote.textContent = "";
-  formNote.className = "form-note";
+    if (message.length < 10) {
+      messageError.textContent = "Message must contain at least 10 characters.";
+      isValid = false;
+    }
 
-  // =====================================
-  // 5. VALIDATE EACH FIELD
-  // =====================================
+    if (!isValid) {
+      formNote.textContent = "Please correct the errors above.";
+      formNote.classList.add("error-message");
+      return;
+    }
 
-  let isValid = true;
+    const recipient = "vedantidalane22@gmail.com";
 
-  // Name validation
+    const mailSubject = encodeURIComponent(subject);
 
-  if (name.length < 2) {
-    setError("nameError", "Please enter your name (at least 2 characters).");
+    const mailBody = encodeURIComponent(
+      "Name: " + name + "\nEmail: " + email + "\n\nMessage:\n" + message,
+    );
 
-    isValid = false;
-  }
+    const mailtoLink =
+      "mailto:" + recipient + "?subject=" + mailSubject + "&body=" + mailBody;
 
-  // Email validation
+    formNote.textContent = "Opening your email application...";
+    formNote.classList.add("success");
 
-  if (!emailPattern.test(email)) {
-    setError("emailError", "Please enter a valid email address.");
+    window.location.href = mailtoLink;
+  });
+}
 
-    isValid = false;
-  }
+// ========================================
+// CURRENT YEAR IN FOOTER
+// ========================================
 
-  // Subject validation
+const yearElement = document.getElementById("year");
 
-  if (subject.length < 3) {
-    setError("subjectError", "Please enter a valid subject.");
+if (yearElement) {
+  yearElement.textContent = new Date().getFullYear();
+}
 
-    isValid = false;
-  }
+// ========================================
+// ACTIVE NAVIGATION LINK
+// ========================================
 
-  // Message validation
+const sections = document.querySelectorAll("main section[id]");
+const navigationLinks = document.querySelectorAll(".nav-link");
 
-  if (message.length < 10) {
-    setError("messageError", "Message must contain at least 10 characters.");
+function updateActiveLink() {
+  let currentSection = "home";
 
-    isValid = false;
-  }
+  sections.forEach(function (section) {
+    const sectionTop = section.offsetTop - 140;
 
-  // =====================================
-  // 6. DISPLAY VALIDATION NOTIFICATION
-  // =====================================
+    if (window.scrollY >= sectionTop) {
+      currentSection = section.getAttribute("id");
+    }
+  });
 
-  if (!isValid) {
-    formNote.textContent =
-      "Please correct the highlighted errors and try again.";
+  navigationLinks.forEach(function (link) {
+    link.classList.toggle(
+      "active",
+      link.getAttribute("href") === "#" + currentSection,
+    );
+  });
+}
 
-    formNote.classList.add("error-message");
-
-    return;
-  }
-
-  // =====================================
-  // 7. PREPARE EMAIL
-  // =====================================
-
-  const recipient = "vedantidalane22@gmail.com";
-
-  const body =
-    `Name: ${name}\n` + `Email: ${email}\n\n` + `Message: ${message}`;
-
-  const mailto =
-    `mailto:${recipient}` +
-    `?subject=${encodeURIComponent(subject)}` +
-    `&body=${encodeURIComponent(body)}`;
-
-  // =====================================
-  // 8. SUCCESS NOTIFICATION
-  // =====================================
-
-  formNote.textContent =
-    "Your details are valid! Your email application is opening. Please click Send to deliver your message.";
-
-  formNote.classList.add("success");
-
-  // =====================================
-  // 9. OPEN EMAIL APPLICATION
-  // =====================================
-
-  window.location.href = mailto;
-});
-
-// =========================================
-// 10. AUTOMATIC FOOTER YEAR
-// =========================================
-
-document.getElementById("year").textContent = new Date().getFullYear();
+window.addEventListener("scroll", updateActiveLink);
+updateActiveLink();
