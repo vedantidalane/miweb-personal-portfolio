@@ -1012,3 +1012,17 @@ html[data-theme="dark"] .hero {
     position: relative;
     z-index: 1;
 }
+/* Force background image in dark mode */
+html[data-theme="dark"] .hero {
+    background-image:
+        linear-gradient(
+            rgba(12, 18, 16, 0.78),
+            rgba(12, 18, 16, 0.88)
+        ),
+        url("https://images.unsplash.com/photo-1497366754035-f200968a6e72?w=1920&auto=format&fit=crop&q=85") !important;
+
+    background-size: cover !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    background-color: #101713;
+}
